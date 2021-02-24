@@ -1,0 +1,10 @@
+Key features:
+-Tracking active application time
+-Saving information into a file
+-Including only certain programs
+-Running in the background (use pythonw)
+-No performance overhead
+
+Extra features:
+-GUI
+-Cloud saving (database)
