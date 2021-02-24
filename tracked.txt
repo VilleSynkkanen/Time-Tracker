@@ -1,0 +1,2 @@
+pycharm64.exe:43
+Spotify.exe:181

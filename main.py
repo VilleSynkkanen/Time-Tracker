@@ -1,33 +1,61 @@
 import time
-from os import system
+import os
 import datetime
 import sys
-if sys.platform in ['Windows', 'win32', 'cygwin']:
-    import win32gui
+import psutil
+import win32process
+import win32gui
 
 polling_time = 1
 
 
+def get_tracked_applications():
+    file = open("tracked.txt", 'r')
+    tracked = {}
+    for line in file:
+        line = line.split(":")
+        for i in range(0, len(line)):
+            line[i] = line[i].strip()
+        tracked[line[0]] = int(line[1])
+    file.close()
+    #print(tracked)
+    return tracked
+
+
+def write_times(applications):
+    file = open("tracked.txt", 'w')
+    for app in applications:
+        file.write(app + ":" + str(applications[app]) + "\n")
+    file.close()
+
+
 def get_active_window():
-    active_window_name = None
-    if sys.platform in ['Windows', 'win32', 'cygwin']:
-        window = win32gui.GetForegroundWindow()
-        active_window_name = win32gui.GetWindowText(window)
-    return active_window_name
+    try:
+        pid = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
+        return psutil.Process(pid[-1]).name()
+    except psutil.NoSuchProcess:
+        return None
 
 
 def main():
-    active_window = ""
+    tracked_applications = get_tracked_applications()
+    active_window = None
     start_time = datetime.datetime.now()
     while True:
         window_name = get_active_window()
         if active_window != window_name:
             end_time = datetime.datetime.now()
-            print("Use time: ", end_time-start_time)
+            delta = end_time - start_time
+            if active_window is not None:
+                #print("Executable:", active_window, "\nUse time:", delta.seconds, "seconds")
+                if active_window in tracked_applications:
+                    tracked_applications[active_window] += delta.seconds
+                '''else:
+                    tracked_applications[active_window] = delta.seconds'''
+                write_times(tracked_applications)
             start_time = end_time
-
             active_window = window_name
-            print("Window name: ", active_window)
+
         time.sleep(polling_time)
 
 
