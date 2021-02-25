@@ -50,8 +50,8 @@ def main():
                 #print("Executable:", active_window, "\nUse time:", delta.seconds, "seconds")
                 if active_window in tracked_applications:
                     tracked_applications[active_window] += delta.seconds
-                '''else:
-                    tracked_applications[active_window] = delta.seconds'''
+                else:
+                    tracked_applications[active_window] = delta.seconds
                 write_times(tracked_applications)
             start_time = end_time
             active_window = window_name

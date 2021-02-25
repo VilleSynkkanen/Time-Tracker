@@ -1,10 +1,17 @@
 Key features:
--Tracking active application time
--Saving information into a file
--Including only certain programs
--Running in the background (use pythonw)
--No performance overhead
+-GUI (using PyQt)
+	-Tracking statistics
+		-tracking started
+		-use time
+		-last used
+	-Including only certain programs
+	-naming programs (instead of using .exe name)
+	-Track all programs (on/off)
+	-Launch automatically on booting (on/off)
+	-Stop/start process manually
 
 Extra features:
--GUI
 -Cloud saving (database)
+
+How to run:
+-pythonw main.py

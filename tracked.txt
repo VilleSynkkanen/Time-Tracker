@@ -1,2 +1,10 @@
-pycharm64.exe:43
-Spotify.exe:181
+pycharm64.exe:456
+Spotify.exe:367
+dirtrally2.exe:5215
+powershell.exe:26
+Taskmgr.exe:67
+explorer.exe:22
+firefox.exe:241
+notepad++.exe:775
+SearchApp.exe:2
+Discord.exe:21
