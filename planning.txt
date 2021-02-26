@@ -1,3 +1,9 @@
+Todo:
+-more statistics
+-file structure
+-class structure
+-user interface
+
 Key features:
 -GUI (using PyQt)
 	-Tracking statistics
@@ -14,4 +20,13 @@ Extra features:
 -Cloud saving (database)
 
 How to run:
--pythonw main.py
+-run the included bat file
+
+Run on startup:
+-add a shortcut to the bat file to the startup folder of start menu 
+(C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup)
+
+Dependencies:
+-WMI
+-psutil
+-pyqt5

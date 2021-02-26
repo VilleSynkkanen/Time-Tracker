@@ -35,6 +35,8 @@ def get_active_window():
         return psutil.Process(pid[-1]).name()
     except psutil.NoSuchProcess:
         return None
+    except ValueError:
+        return None
 
 
 def main():
