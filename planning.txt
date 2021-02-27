@@ -1,20 +1,22 @@
 Todo:
--more statistics
--file structure
--class structure
--user interface
+-GUI
 
 Key features:
--GUI (using PyQt)
-	-Tracking statistics
+-Tracker app
+	-Tracking statistics (done)
+		-application name
 		-tracking started
 		-use time
 		-last used
-	-Including only certain programs
-	-naming programs (instead of using .exe name)
-	-Track all programs (on/off)
-	-Launch automatically on booting (on/off)
-	-Stop/start process manually
+-GUI (using PyQt)
+	-Launching GUI stops tracker, closing starts it again
+	-Edit application name
+	-Favorites, hidden programs
+	-Sorting, search
+
+Optimizations:
+-longer save intervals
+-timezone fix
 
 Extra features:
 -Cloud saving (database)
@@ -30,3 +32,4 @@ Dependencies:
 -WMI
 -psutil
 -pyqt5
+-jsons
