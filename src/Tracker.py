@@ -23,8 +23,11 @@ def get_tracked_applications():
 
 
 def write_times(applications):
-    with open("data/tracked.json", "w") as write_file:
-        json.dump(jsons.dump(applications), write_file)
+    try:
+        with open("data/tracked.json", "w") as write_file:
+            json.dump(jsons.dump(applications), write_file)
+    except OSError:
+        pass
 
 
 def get_active_window():
