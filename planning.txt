@@ -1,5 +1,8 @@
 Todo:
--GUI
+-Edit application name
+-Favorites, hidden
+-sorting
+-search
 
 Key features:
 -Tracker app
@@ -9,14 +12,17 @@ Key features:
 		-use time
 		-last used
 -GUI (using PyQt)
-	-Launching GUI stops tracker, closing starts it again
 	-Edit application name
-	-Favorites, hidden programs
+	-Favorites, hidden programs (add to json)
 	-Sorting, search
+	-Launching GUI stops tracker, closing starts it again
 
 Optimizations:
--longer save intervals
--timezone fix
+-longer save intervals (30 minutes or on exit)
+	-30 minutes must pass between saves
+	-catch exit or process kill with signals
+-better kill procedure: get pid number of the process (save to a file on startup), kill within code
+-refactor code
 
 Extra features:
 -Cloud saving (database)

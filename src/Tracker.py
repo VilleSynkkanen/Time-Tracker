@@ -36,6 +36,12 @@ def get_active_window():
         return psutil.Process(pid[-1]).name()
     except psutil.NoSuchProcess:
         return None
+    except psutil.AccessDenied:
+        return None
+    except AttributeError:
+        return None
+    except PermissionError:
+        return None
     except ValueError:
         return None
 
@@ -58,7 +64,8 @@ def main():
                     tracked_applications[active_window].last = end_time
                 else:
                     # create AppInfo instance, add it to tracked apps
-                    info = AppInfo(active_window, delta.seconds, start_time, end_time)
+                    name = active_window.split(".")[0]
+                    info = AppInfo(name, delta.seconds, start_time, end_time)
                     tracked_applications[active_window] = info
                 write_times(tracked_applications)
             start_time = end_time
