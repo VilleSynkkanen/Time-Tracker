@@ -1,5 +1,5 @@
 Todo:
--Edit application name
+-Edit application name (one button for saving everything at once)
 -Favorites, hidden
 -sorting
 -search

@@ -61,7 +61,6 @@ class UserInterface(QtWidgets.QMainWindow):
                   int(res_y / 2) - int(self.frameSize().height() / 2))
 
         self.tracked = UserInterface.get_tracked_applications()
-        print(self.tracked)
 
         self.scroll_area_widget = QtWidgets.QWidget()
         self.__scroll_area.setWidget(self.scroll_area_widget)
