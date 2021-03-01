@@ -1,8 +1,11 @@
 Todo:
--Edit application name (one button for saving everything at once)
 -Favorites, hidden
--sorting
+	-ability to edit 
+	-display favorites/hide on/off
+	-save changes button (tie to name saving)
 -search
+	-name or executable name
+-optimizations
 
 Key features:
 -Tracker app
@@ -12,9 +15,10 @@ Key features:
 		-use time
 		-last used
 -GUI (using PyQt)
-	-Edit application name
-	-Favorites, hidden programs (add to json)
-	-Sorting, search
+	-Edit application name (done)
+	-Favorites, hidden programs
+	-Sorting (done)
+	-Search
 	-Launching GUI stops tracker, closing starts it again
 
 Optimizations:
@@ -22,7 +26,7 @@ Optimizations:
 	-30 minutes must pass between saves
 	-catch exit or process kill with signals
 -better kill procedure: get pid number of the process (save to a file on startup), kill within code
--refactor code
+-refactor code, remove duplicates, etc.
 
 Extra features:
 -Cloud saving (database)

@@ -7,3 +7,5 @@ class AppInfo:
         self.use_time = use_time
         self.started = started
         self.last = last
+        self.favourite = False
+        self.hidden = False

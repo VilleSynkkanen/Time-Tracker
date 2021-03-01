@@ -1,7 +1,8 @@
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 import sys
 import json
 import jsons
+import atexit
 from AppInfo import AppInfo
 
 
@@ -26,8 +27,8 @@ class UserInterface(QtWidgets.QMainWindow):
         self.__main_layout.addLayout(self.__button_layout)
 
         # widgetit
-        self.__jatka_nappi = QtWidgets.QPushButton("BUTTON")
-        self.__jatka_nappi.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        self.sorting_button = QtWidgets.QPushButton("SORTING BY\nNAME")
+        self.sorting_button.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         self.__pelaa_nappi = QtWidgets.QPushButton("BUTTON")
         self.__pelaa_nappi.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         self.__kenttaeditori_nappi = QtWidgets.QPushButton("BUTTON")
@@ -35,21 +36,15 @@ class UserInterface(QtWidgets.QMainWindow):
         self.__poistu_nappi = QtWidgets.QPushButton("BUTTON")
         self.__poistu_nappi.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
 
-        self.__jatka_nappi.setStyleSheet("font: 10pt Arial")
+        self.sorting_button.setStyleSheet("font: 10pt Arial")
         self.__pelaa_nappi.setStyleSheet("font: 10pt Arial")
         self.__kenttaeditori_nappi.setStyleSheet("font: 10pt Arial")
         self.__poistu_nappi.setStyleSheet("font: 10pt Arial")
 
-        # nappien yhdistäminen
-        '''
-        self.__jatka_nappi.clicked.connect()
-        self.__pelaa_nappi.clicked.connect()
-        self.__kenttaeditori_nappi.clicked.connect()
-        self.__poistu_nappi.clicked.connect()
-        '''
+        self.sorting_button.clicked.connect(self.change_sorting)
 
         # nappi widgetit
-        self.__button_layout.addWidget(self.__jatka_nappi)
+        self.__button_layout.addWidget(self.sorting_button)
         self.__button_layout.addWidget(self.__pelaa_nappi)
         self.__button_layout.addWidget(self.__kenttaeditori_nappi)
         self.__button_layout.addWidget(self.__poistu_nappi)
@@ -62,35 +57,73 @@ class UserInterface(QtWidgets.QMainWindow):
 
         self.tracked = UserInterface.get_tracked_applications()
 
+        # Table creation
         self.scroll_area_widget = QtWidgets.QWidget()
         self.__scroll_area.setWidget(self.scroll_area_widget)
         self.scroll_area_layout = QtWidgets.QVBoxLayout(self.scroll_area_widget)
+        self.scroll_area_table = QtWidgets.QTableWidget(len(self.tracked), 7)
+        self.scroll_area_layout.addWidget(self.scroll_area_table)
+        self.scroll_area_table.setHorizontalHeaderLabels(["Executable", "Name", "First used", "Last used", "Use time", "Favourite",
+                                                          "Hidden"])
+        self.sorting_mode = 1 # from 1 to 4
+        self.sorting_descriptions = ["NAME", "FIRST USED", "LAST USED", "USE TIME"]
 
+        row = 0
         for application in self.tracked:
             app = self.tracked[application]
-            name = QtWidgets.QLabel("Name: " + app.name)
-            started = QtWidgets.QLabel("First used: " + app.started.strftime("%m/%d/%Y, %H:%M:%S"))
-            ended = QtWidgets.QLabel("Last used: " + app.last.strftime("%m/%d/%Y, %H:%M:%S"))
+            exe_name = QtWidgets.QTableWidgetItem(application)
+            name = QtWidgets.QTableWidgetItem(app.name)
+            started = QtWidgets.QTableWidgetItem(app.started.strftime("%m/%d/%Y, %H:%M:%S"))
+            ended = QtWidgets.QTableWidgetItem(app.last.strftime("%m/%d/%Y, %H:%M:%S"))
             time_used = app.use_time
-            if time_used < 60:
-                time_string = str(app.use_time, ) + " seconds"
-            elif time_used / 60 < 60:
-                time_string = str(round(app.use_time / 60, 1)) + " minutes"
-            else:
-                time_string = str(round(app.use_time / 3600, 2)) + " hours"
-            use_time = QtWidgets.QLabel("Use time: " + time_string)
-            spacer = QtWidgets.QLabel("")
-            self.scroll_area_layout.addWidget(name)
-            self.scroll_area_layout.addWidget(started)
-            self.scroll_area_layout.addWidget(ended)
-            self.scroll_area_layout.addWidget(use_time)
-            self.scroll_area_layout.addWidget(spacer)
+            time_string = str(round(app.use_time / 3600, 3)) + " hours"
+            use_time = QtWidgets.QTableWidgetItem(time_string)
+            favourite = QtWidgets.QTableWidgetItem(str(app.favourite))
+            hidden = QtWidgets.QTableWidgetItem(str(app.hidden))
 
-    def edit_app_name(self, key, name):
-        # change name in tracked dictionary
-        # save to file with another button or on exit
-        pass
+            exe_name.setFlags(started.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
+            started.setFlags(started.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
+            ended.setFlags(ended.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
+            use_time.setFlags(use_time.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
+            favourite.setFlags(favourite.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
+            hidden.setFlags(hidden.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
+            self.scroll_area_table.setItem(row, 0, exe_name)
+            self.scroll_area_table.setItem(row, 1, name)
+            self.scroll_area_table.setItem(row, 2, started)
+            self.scroll_area_table.setItem(row, 3, ended)
+            self.scroll_area_table.setItem(row, 4, use_time)
+            self.scroll_area_table.setItem(row, 5, favourite)
+            self.scroll_area_table.setItem(row, 6, hidden)
+            row += 1
 
+        self.scroll_area_table.horizontalHeader().setStretchLastSection(True)
+        self.scroll_area_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.scroll_area_table.sortItems(self.sorting_mode)
+
+        atexit.register(self.save_changes)
+
+    def change_sorting(self):
+        # sorting by: name, started, last, time
+        self.sorting_mode += 1
+        if self.sorting_mode > 4:
+            self.sorting_mode = 1
+        self.scroll_area_table.sortItems(self.sorting_mode)
+        self.sorting_button.setText("SORTING BY\n" + self.sorting_descriptions[self.sorting_mode - 1])
+
+    def save_changes(self):
+        for row in range(self.scroll_area_table.width()):
+            if self.scroll_area_table.item(row, 0) is not None:
+                self.tracked[self.scroll_area_table.item(row, 0).text()].name = self.scroll_area_table.item(row, 1).text()
+                #print(self.scroll_area_table.item(row, 1).text())
+        UserInterface.write_times(self.tracked)
+
+    @staticmethod
+    def write_times(applications):
+        try:
+            with open("data/tracked.json", "w") as write_file:
+                json.dump(jsons.dump(applications), write_file)
+        except OSError:
+            pass
 
     @staticmethod
     def get_tracked_applications():
