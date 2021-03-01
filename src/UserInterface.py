@@ -27,25 +27,26 @@ class UserInterface(QtWidgets.QMainWindow):
         self.__main_layout.addLayout(self.__button_layout)
 
         # widgetit
-        self.sorting_button = QtWidgets.QPushButton("SORTING BY\nNAME")
+        self.sorting_button = QtWidgets.QPushButton("SORTING BY \nUSE TIME")
         self.sorting_button.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        self.__pelaa_nappi = QtWidgets.QPushButton("BUTTON")
-        self.__pelaa_nappi.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        self.ascending_sorting_button = QtWidgets.QPushButton("DESCENDING\nSORTING")
+        self.ascending_sorting_button.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         self.__kenttaeditori_nappi = QtWidgets.QPushButton("BUTTON")
         self.__kenttaeditori_nappi.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         self.__poistu_nappi = QtWidgets.QPushButton("BUTTON")
         self.__poistu_nappi.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
 
         self.sorting_button.setStyleSheet("font: 10pt Arial")
-        self.__pelaa_nappi.setStyleSheet("font: 10pt Arial")
+        self.ascending_sorting_button.setStyleSheet("font: 10pt Arial")
         self.__kenttaeditori_nappi.setStyleSheet("font: 10pt Arial")
         self.__poistu_nappi.setStyleSheet("font: 10pt Arial")
 
         self.sorting_button.clicked.connect(self.change_sorting)
+        self.ascending_sorting_button.clicked.connect(self.change_ascending_sorting)
 
         # nappi widgetit
         self.__button_layout.addWidget(self.sorting_button)
-        self.__button_layout.addWidget(self.__pelaa_nappi)
+        self.__button_layout.addWidget(self.ascending_sorting_button)
         self.__button_layout.addWidget(self.__kenttaeditori_nappi)
         self.__button_layout.addWidget(self.__poistu_nappi)
 
@@ -65,8 +66,9 @@ class UserInterface(QtWidgets.QMainWindow):
         self.scroll_area_layout.addWidget(self.scroll_area_table)
         self.scroll_area_table.setHorizontalHeaderLabels(["Executable", "Name", "First used", "Last used", "Use time", "Favourite",
                                                           "Hidden"])
-        self.sorting_mode = 1 # from 1 to 4
+        self.sorting_mode = 4 # from 1 to 4
         self.sorting_descriptions = ["NAME", "FIRST USED", "LAST USED", "USE TIME"]
+        self.ascending_sorting = False
 
         row = 0
         for application in self.tracked:
@@ -98,17 +100,31 @@ class UserInterface(QtWidgets.QMainWindow):
 
         self.scroll_area_table.horizontalHeader().setStretchLastSection(True)
         self.scroll_area_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.scroll_area_table.sortItems(self.sorting_mode)
+        self.sort()
 
         atexit.register(self.save_changes)
+
+    def sort(self):
+        if self.ascending_sorting:
+            self.scroll_area_table.sortItems(self.sorting_mode, QtCore.Qt.AscendingOrder)
+        else:
+            self.scroll_area_table.sortItems(self.sorting_mode, QtCore.Qt.DescendingOrder)
+
+    def change_ascending_sorting(self):
+        self.ascending_sorting = not self.ascending_sorting
+        if self.ascending_sorting:
+            self.ascending_sorting_button.setText("ASCENDING\nSORTING")
+        else:
+            self.ascending_sorting_button.setText("DESCENDING\nSORTING")
+        self.sort()
 
     def change_sorting(self):
         # sorting by: name, started, last, time
         self.sorting_mode += 1
         if self.sorting_mode > 4:
             self.sorting_mode = 1
-        self.scroll_area_table.sortItems(self.sorting_mode)
         self.sorting_button.setText("SORTING BY\n" + self.sorting_descriptions[self.sorting_mode - 1])
+        self.sort()
 
     def save_changes(self):
         for row in range(self.scroll_area_table.width()):

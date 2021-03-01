@@ -2,10 +2,11 @@ Todo:
 -Favorites, hidden
 	-ability to edit 
 	-display favorites/hide on/off
-	-save changes button (tie to name saving)
--search
-	-name or executable name
+	-save changes button (tie to name saving as well)
 -optimizations
+-stop tracker
+-refactor code, remove duplicates, etc.
+-polish
 
 Key features:
 -Tracker app
@@ -18,7 +19,6 @@ Key features:
 	-Edit application name (done)
 	-Favorites, hidden programs
 	-Sorting (done)
-	-Search
 	-Launching GUI stops tracker, closing starts it again
 
 Optimizations:
@@ -26,10 +26,6 @@ Optimizations:
 	-30 minutes must pass between saves
 	-catch exit or process kill with signals
 -better kill procedure: get pid number of the process (save to a file on startup), kill within code
--refactor code, remove duplicates, etc.
-
-Extra features:
--Cloud saving (database)
 
 How to run:
 -run the included bat file
