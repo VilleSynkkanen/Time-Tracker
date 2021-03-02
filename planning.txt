@@ -1,10 +1,6 @@
 Todo:
--Favorites, hidden
-	-ability to edit 
-	-display favorites/hide on/off
-	-save changes button (tie to name saving as well)
--optimizations
 -stop tracker
+-optimizations
 -refactor code, remove duplicates, etc.
 -polish
 
@@ -17,7 +13,7 @@ Key features:
 		-last used
 -GUI (using PyQt)
 	-Edit application name (done)
-	-Favorites, hidden programs
+	-Favorites, hidden programs (done)
 	-Sorting (done)
 	-Launching GUI stops tracker, closing starts it again
 

@@ -1,5 +1,4 @@
 from PyQt5 import QtWidgets, QtCore
-import sys
 import json
 import jsons
 import atexit
@@ -31,24 +30,21 @@ class UserInterface(QtWidgets.QMainWindow):
         self.sorting_button.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         self.ascending_sorting_button = QtWidgets.QPushButton("DESCENDING\nSORTING")
         self.ascending_sorting_button.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        self.__kenttaeditori_nappi = QtWidgets.QPushButton("BUTTON")
-        self.__kenttaeditori_nappi.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        self.__poistu_nappi = QtWidgets.QPushButton("BUTTON")
-        self.__poistu_nappi.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        self.hide_button = QtWidgets.QPushButton("HIDDEN\nINVISIBLE")
+        self.hide_button.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        self.favourites_button = QtWidgets.QPushButton("FAVOURITES\nOFF")
+        self.favourites_button.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
 
         self.sorting_button.setStyleSheet("font: 10pt Arial")
         self.ascending_sorting_button.setStyleSheet("font: 10pt Arial")
-        self.__kenttaeditori_nappi.setStyleSheet("font: 10pt Arial")
-        self.__poistu_nappi.setStyleSheet("font: 10pt Arial")
-
-        self.sorting_button.clicked.connect(self.change_sorting)
-        self.ascending_sorting_button.clicked.connect(self.change_ascending_sorting)
+        self.hide_button.setStyleSheet("font: 10pt Arial")
+        self.favourites_button.setStyleSheet("font: 10pt Arial")
 
         # nappi widgetit
         self.__button_layout.addWidget(self.sorting_button)
         self.__button_layout.addWidget(self.ascending_sorting_button)
-        self.__button_layout.addWidget(self.__kenttaeditori_nappi)
-        self.__button_layout.addWidget(self.__poistu_nappi)
+        self.__button_layout.addWidget(self.hide_button)
+        self.__button_layout.addWidget(self.favourites_button)
 
         # keskelle liikuttaminen
         res_x = 2560
@@ -70,6 +66,9 @@ class UserInterface(QtWidgets.QMainWindow):
         self.sorting_descriptions = ["NAME", "FIRST USED", "LAST USED", "USE TIME"]
         self.ascending_sorting = False
 
+        self.favourites_only = False
+        self.hide_hidden = True
+
         row = 0
         for application in self.tracked:
             app = self.tracked[application]
@@ -82,6 +81,8 @@ class UserInterface(QtWidgets.QMainWindow):
             use_time = QtWidgets.QTableWidgetItem(time_string)
             favourite = QtWidgets.QTableWidgetItem(str(app.favourite))
             hidden = QtWidgets.QTableWidgetItem(str(app.hidden))
+            if self.hide_hidden and app.hidden:
+                self.scroll_area_table.hideRow(row)
 
             exe_name.setFlags(started.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
             started.setFlags(started.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
@@ -102,7 +103,75 @@ class UserInterface(QtWidgets.QMainWindow):
         self.scroll_area_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.sort()
 
+        self.scroll_area_table.clicked.connect(self.cell_clicked)
+
+        self.sorting_button.clicked.connect(self.change_sorting)
+        self.ascending_sorting_button.clicked.connect(self.change_ascending_sorting)
+        self.hide_button.clicked.connect(self.toggle_hiding)
+        self.favourites_button.clicked.connect(self.toggle_favourites)
+
         atexit.register(self.save_changes)
+
+    def toggle_favourites(self):
+        self.favourites_only = not self.favourites_only
+        if self.favourites_only:
+            self.favourites_button.setText("FAVOURITES\nON")
+            for row in range(self.scroll_area_table.rowCount()):
+                if self.scroll_area_table.item(row, 5).text() == "False":
+                    self.scroll_area_table.hideRow(row)
+        else:
+            self.favourites_button.setText("FAVOURITES\nOFF")
+            if self.hide_hidden:
+                for row in range(self.scroll_area_table.rowCount()):
+                    if self.scroll_area_table.item(row, 5).text() == "False" and self.scroll_area_table.item(row, 6).text() == "False":
+                        self.scroll_area_table.showRow(row)
+            else:
+                for row in range(self.scroll_area_table.rowCount()):
+                    if self.scroll_area_table.item(row, 5).text() == "False":
+                        self.scroll_area_table.showRow(row)
+
+    def toggle_hiding(self):
+        self.hide_hidden = not self.hide_hidden
+        if self.hide_hidden:
+            self.hide_button.setText("HIDDEN\nINVISIBLE")
+            for row in range(self.scroll_area_table.rowCount()):
+                if self.scroll_area_table.item(row, 6).text() == "True":
+                    self.scroll_area_table.hideRow(row)
+        else:
+            self.hide_button.setText("HIDDEN\nVISIBLE")
+            if self.favourites_only:
+                for row in range(self.scroll_area_table.rowCount()):
+                    if self.scroll_area_table.item(row, 5).text() == "True" and self.scroll_area_table.item(row, 6).text() == "True":
+                        self.scroll_area_table.showRow(row)
+            else:
+                for row in range(self.scroll_area_table.rowCount()):
+                    if self.scroll_area_table.item(row, 6).text() == "True":
+                        self.scroll_area_table.showRow(row)
+
+    def cell_clicked(self, item):
+        col = item.column()
+        row = item.row()
+        print(row, col)
+        if col == 5:
+            it = self.scroll_area_table.item(row, col).text()
+            if it == "False":
+                self.scroll_area_table.item(row, col).setText("True")
+                self.tracked[self.scroll_area_table.item(row, 0).text()].favourite = True
+            elif it == "True":
+                self.scroll_area_table.item(row, col).setText("False")
+                self.tracked[self.scroll_area_table.item(row, 0).text()].favourite = False
+                if self.favourites_only:
+                    self.scroll_area_table.hideRow(row)
+        elif col == 6:
+            it = self.scroll_area_table.item(row, col).text()
+            if it == "False":
+                self.scroll_area_table.item(row, col).setText("True")
+                self.tracked[self.scroll_area_table.item(row, 0).text()].hidden = True
+                if self.hide_hidden:
+                    self.scroll_area_table.hideRow(row)
+            elif it == "True":
+                self.scroll_area_table.item(row, col).setText("False")
+                self.tracked[self.scroll_area_table.item(row, 0).text()].hidden = False
 
     def sort(self):
         if self.ascending_sorting:
