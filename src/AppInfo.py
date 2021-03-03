@@ -1,5 +1,3 @@
-
-
 class AppInfo:
 
     def __init__(self, name, use_time, started, last):

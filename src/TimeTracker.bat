@@ -1,3 +1,3 @@
 @echo off
 rem
-start "title" /b pythonw Tracker.py
+start "title" /b pythonw TrackerApplication.py

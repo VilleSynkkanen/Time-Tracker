@@ -1,6 +1,5 @@
 Todo:
--stop tracker
--optimizations
+-longer save intervals (30 min)
 -refactor code, remove duplicates, etc.
 -polish
 
@@ -15,13 +14,8 @@ Key features:
 	-Edit application name (done)
 	-Favorites, hidden programs (done)
 	-Sorting (done)
-	-Launching GUI stops tracker, closing starts it again
-
-Optimizations:
--longer save intervals (30 minutes or on exit)
-	-30 minutes must pass between saves
-	-catch exit or process kill with signals
--better kill procedure: get pid number of the process (save to a file on startup), kill within code
+	-Launching GUI stops tracker (done)
+	-Closing starts tracker again
 
 How to run:
 -run the included bat file

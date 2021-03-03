@@ -1,13 +1,15 @@
 from PyQt5 import QtWidgets, QtCore
-import json
-import jsons
 import atexit
-from AppInfo import AppInfo
+import os
+import signal
+import subprocess
+from Tracker import Tracker
 
 
 class UserInterface(QtWidgets.QMainWindow):
 
     def __init__(self):
+        UserInterface.kill_tracker()
         super(UserInterface, self).__init__()
         self.__scene_size = 880
         self.setCentralWidget(QtWidgets.QWidget())
@@ -52,7 +54,7 @@ class UserInterface(QtWidgets.QMainWindow):
         self.move(int(res_x / 2) - int(self.frameSize().width() / 2),
                   int(res_y / 2) - int(self.frameSize().height() / 2))
 
-        self.tracked = UserInterface.get_tracked_applications()
+        self.tracked = Tracker.get_tracked_applications()
 
         # Table creation
         self.scroll_area_widget = QtWidgets.QWidget()
@@ -60,7 +62,7 @@ class UserInterface(QtWidgets.QMainWindow):
         self.scroll_area_layout = QtWidgets.QVBoxLayout(self.scroll_area_widget)
         self.scroll_area_table = QtWidgets.QTableWidget(len(self.tracked), 7)
         self.scroll_area_layout.addWidget(self.scroll_area_table)
-        self.scroll_area_table.setHorizontalHeaderLabels(["Executable", "Name", "First used", "Last used", "Use time", "Favourite",
+        self.scroll_area_table.setHorizontalHeaderLabels(["Executable", "Name", "First used", "Last used", "Use time (hours)", "Favourite",
                                                           "Hidden"])
         self.sorting_mode = 4 # from 1 to 4
         self.sorting_descriptions = ["NAME", "FIRST USED", "LAST USED", "USE TIME"]
@@ -76,9 +78,9 @@ class UserInterface(QtWidgets.QMainWindow):
             name = QtWidgets.QTableWidgetItem(app.name)
             started = QtWidgets.QTableWidgetItem(app.started.strftime("%m/%d/%Y, %H:%M:%S"))
             ended = QtWidgets.QTableWidgetItem(app.last.strftime("%m/%d/%Y, %H:%M:%S"))
-            time_used = app.use_time
-            time_string = str(round(app.use_time / 3600, 3)) + " hours"
-            use_time = QtWidgets.QTableWidgetItem(time_string)
+            time_displayed = round(app.use_time / 3600, 2)
+            use_time = QtWidgets.QTableWidgetItem()
+            use_time.setData(QtCore.Qt.DisplayRole, time_displayed)
             favourite = QtWidgets.QTableWidgetItem(str(app.favourite))
             hidden = QtWidgets.QTableWidgetItem(str(app.hidden))
             if self.hide_hidden and app.hidden:
@@ -111,6 +113,20 @@ class UserInterface(QtWidgets.QMainWindow):
         self.favourites_button.clicked.connect(self.toggle_favourites)
 
         atexit.register(self.save_changes)
+        atexit.register(UserInterface.start_tracker)
+
+    @staticmethod
+    def start_tracker():
+        subprocess.call(["TimeTracker.bat"])
+
+    @staticmethod
+    def kill_tracker():
+        file = open("data/pid.txt")
+        pid = int(file.readline().rstrip())
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except OSError:
+            pass
 
     def toggle_favourites(self):
         self.favourites_only = not self.favourites_only
@@ -199,25 +215,5 @@ class UserInterface(QtWidgets.QMainWindow):
         for row in range(self.scroll_area_table.width()):
             if self.scroll_area_table.item(row, 0) is not None:
                 self.tracked[self.scroll_area_table.item(row, 0).text()].name = self.scroll_area_table.item(row, 1).text()
-                #print(self.scroll_area_table.item(row, 1).text())
-        UserInterface.write_times(self.tracked)
+        Tracker.write_times(self.tracked)
 
-    @staticmethod
-    def write_times(applications):
-        try:
-            with open("data/tracked.json", "w") as write_file:
-                json.dump(jsons.dump(applications), write_file)
-        except OSError:
-            pass
-
-    @staticmethod
-    def get_tracked_applications():
-        tracked = {}
-        try:
-            with open("data/tracked.json", "r") as read_file:
-                data = json.load(read_file)
-                for application in data:
-                    tracked[application] = jsons.load(data[application], AppInfo)
-        except OSError:
-            pass
-        return tracked

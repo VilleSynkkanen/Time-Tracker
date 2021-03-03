@@ -5,72 +5,93 @@ import win32process
 import win32gui
 import json
 import jsons
+import os
+import signal
+import atexit
 from AppInfo import AppInfo
 
-polling_time = 1
 
+class Tracker:
 
-def get_tracked_applications():
-    tracked = {}
-    try:
-        with open("data/tracked.json", "r") as read_file:
-            data = json.load(read_file)
-            for application in data:
-                tracked[application] = jsons.load(data[application], AppInfo)
-    except OSError:
-        pass
-    return tracked
+    def __init__(self):
+        self.polling_time = 1
+        self.tracked_applications = Tracker.get_tracked_applications()
+        pid = os.getpid()
+        Tracker.save_pid(pid)
+        jsons.suppress_warnings(True)
+        atexit.register(self.handle_exit)
+        signal.signal(signal.SIGTERM, self.handle_exit)
+        signal.signal(signal.SIGINT, self.handle_exit)
+        self.tracking_loop()
 
+    @staticmethod
+    def get_tracked_applications():
+        tracked = {}
+        try:
+            with open("data/tracked.json", "r") as read_file:
+                data = json.load(read_file)
+                for application in data:
+                    tracked[application] = jsons.load(data[application], AppInfo)
+        except OSError:
+            pass
+        return tracked
 
-def write_times(applications):
-    try:
-        with open("data/tracked.json", "w") as write_file:
-            json.dump(jsons.dump(applications), write_file)
-    except OSError:
-        pass
+    @staticmethod
+    def write_times(applications):
+        try:
+            with open("data/tracked.json", "w") as write_file:
+                json.dump(jsons.dump(applications), write_file)
+        except OSError:
+            pass
 
+    @staticmethod
+    def save_pid(pid):
+        try:
+            file = open("data/pid.txt", "w")
+            file.write(str(pid))
+            file.close()
+        except OSError:
+            pass
 
-def get_active_window():
-    try:
-        pid = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
-        return psutil.Process(pid[-1]).name()
-    except psutil.NoSuchProcess:
-        return None
-    except psutil.AccessDenied:
-        return None
-    except AttributeError:
-        return None
-    except PermissionError:
-        return None
-    except ValueError:
-        return None
+    @staticmethod
+    def get_active_window():
+        try:
+            pid = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
+            return psutil.Process(pid[-1]).name()
+        except psutil.NoSuchProcess:
+            return None
+        except psutil.AccessDenied:
+            return None
+        except AttributeError:
+            return None
+        except PermissionError:
+            return None
+        except ValueError:
+            return None
 
+    def handle_exit(self):
+        print("exiting")
+        Tracker.write_times(self.tracked_applications)
 
-def main():
-    # suppress no timezones warning
-    jsons.suppress_warnings(True)
-    tracked_applications = get_tracked_applications()
-    active_window = None
-    start_time = datetime.datetime.now()
-    while True:
-        window_name = get_active_window()
-        if active_window != window_name:
-            end_time = datetime.datetime.now()
-            delta = end_time - start_time
-            if active_window is not None:
-                if active_window in tracked_applications:
-                    # update AppInfo
-                    tracked_applications[active_window].use_time += delta.seconds
-                    tracked_applications[active_window].last = end_time
-                else:
-                    # create AppInfo instance, add it to tracked apps
-                    name = active_window.split(".")[0]
-                    info = AppInfo(name, delta.seconds, start_time, end_time)
-                    tracked_applications[active_window] = info
-                write_times(tracked_applications)
-            start_time = end_time
-            active_window = window_name
-        time.sleep(polling_time)
-
-
-main()
+    def tracking_loop(self):
+        active_window = None
+        start_time = datetime.datetime.now()
+        while True:
+            window_name = self.get_active_window()
+            if active_window != window_name:
+                end_time = datetime.datetime.now()
+                delta = end_time - start_time
+                if active_window is not None:
+                    if active_window in self.tracked_applications:
+                        # update AppInfo
+                        self.tracked_applications[active_window].use_time += delta.seconds
+                        self.tracked_applications[active_window].last = end_time
+                    else:
+                        # create AppInfo instance, add it to tracked apps
+                        name = active_window.split(".")[0]
+                        info = AppInfo(name, delta.seconds, start_time, end_time)
+                        self.tracked_applications[active_window] = info
+                    Tracker.write_times(self.tracked_applications)
+                start_time = end_time
+                active_window = window_name
+            time.sleep(self.polling_time)
