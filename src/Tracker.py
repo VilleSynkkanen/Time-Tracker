@@ -15,11 +15,13 @@ class Tracker:
 
     def __init__(self):
         self.polling_time = 1
+        self.save_interval = 1
         self.tracked_applications = Tracker.get_tracked_applications()
         pid = os.getpid()
         Tracker.save_pid(pid)
         jsons.suppress_warnings(True)
         atexit.register(self.handle_exit)
+        self.kill_now = False
         signal.signal(signal.SIGTERM, self.handle_exit)
         signal.signal(signal.SIGINT, self.handle_exit)
         self.tracking_loop()
@@ -70,13 +72,15 @@ class Tracker:
             return None
 
     def handle_exit(self):
-        print("exiting")
+        self.kill_now = True
         Tracker.write_times(self.tracked_applications)
 
     def tracking_loop(self):
         active_window = None
         start_time = datetime.datetime.now()
-        while True:
+        save_time = start_time
+        while not self.kill_now:
+            time.sleep(self.polling_time)
             window_name = self.get_active_window()
             if active_window != window_name:
                 end_time = datetime.datetime.now()
@@ -91,7 +95,9 @@ class Tracker:
                         name = active_window.split(".")[0]
                         info = AppInfo(name, delta.seconds, start_time, end_time)
                         self.tracked_applications[active_window] = info
-                    Tracker.write_times(self.tracked_applications)
+                    # check save interval
+                    if (end_time - save_time).seconds >= self.save_interval:
+                        Tracker.write_times(self.tracked_applications)
+                        save_time = end_time
                 start_time = end_time
                 active_window = window_name
-            time.sleep(self.polling_time)

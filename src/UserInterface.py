@@ -27,7 +27,6 @@ class UserInterface(QtWidgets.QMainWindow):
         self.__button_layout = QtWidgets.QVBoxLayout()
         self.__main_layout.addLayout(self.__button_layout)
 
-        # widgetit
         self.sorting_button = QtWidgets.QPushButton("SORTING BY \nUSE TIME")
         self.sorting_button.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         self.ascending_sorting_button = QtWidgets.QPushButton("DESCENDING\nSORTING")
@@ -42,13 +41,11 @@ class UserInterface(QtWidgets.QMainWindow):
         self.hide_button.setStyleSheet("font: 10pt Arial")
         self.favourites_button.setStyleSheet("font: 10pt Arial")
 
-        # nappi widgetit
         self.__button_layout.addWidget(self.sorting_button)
         self.__button_layout.addWidget(self.ascending_sorting_button)
         self.__button_layout.addWidget(self.hide_button)
         self.__button_layout.addWidget(self.favourites_button)
 
-        # keskelle liikuttaminen
         res_x = 2560
         res_y = 1440
         self.move(int(res_x / 2) - int(self.frameSize().width() / 2),
@@ -56,15 +53,14 @@ class UserInterface(QtWidgets.QMainWindow):
 
         self.tracked = Tracker.get_tracked_applications()
 
-        # Table creation
         self.scroll_area_widget = QtWidgets.QWidget()
         self.__scroll_area.setWidget(self.scroll_area_widget)
         self.scroll_area_layout = QtWidgets.QVBoxLayout(self.scroll_area_widget)
         self.scroll_area_table = QtWidgets.QTableWidget(len(self.tracked), 7)
         self.scroll_area_layout.addWidget(self.scroll_area_table)
-        self.scroll_area_table.setHorizontalHeaderLabels(["Executable", "Name", "First used", "Last used", "Use time (hours)", "Favourite",
-                                                          "Hidden"])
-        self.sorting_mode = 4 # from 1 to 4
+        self.scroll_area_table.setHorizontalHeaderLabels(["Executable", "Name", "First used", "Last used",
+                                                          "Use time (hours)", "Favourite", "Hidden"])
+        self.sorting_mode = 4  # from 1 to 4
         self.sorting_descriptions = ["NAME", "FIRST USED", "LAST USED", "USE TIME"]
         self.ascending_sorting = False
 
@@ -139,7 +135,8 @@ class UserInterface(QtWidgets.QMainWindow):
             self.favourites_button.setText("FAVOURITES\nOFF")
             if self.hide_hidden:
                 for row in range(self.scroll_area_table.rowCount()):
-                    if self.scroll_area_table.item(row, 5).text() == "False" and self.scroll_area_table.item(row, 6).text() == "False":
+                    if self.scroll_area_table.item(row, 5).text() == "False" and \
+                            self.scroll_area_table.item(row, 6).text() == "False":
                         self.scroll_area_table.showRow(row)
             else:
                 for row in range(self.scroll_area_table.rowCount()):
@@ -157,7 +154,8 @@ class UserInterface(QtWidgets.QMainWindow):
             self.hide_button.setText("HIDDEN\nVISIBLE")
             if self.favourites_only:
                 for row in range(self.scroll_area_table.rowCount()):
-                    if self.scroll_area_table.item(row, 5).text() == "True" and self.scroll_area_table.item(row, 6).text() == "True":
+                    if self.scroll_area_table.item(row, 5).text() == "True" and \
+                            self.scroll_area_table.item(row, 6).text() == "True":
                         self.scroll_area_table.showRow(row)
             else:
                 for row in range(self.scroll_area_table.rowCount()):
@@ -214,6 +212,7 @@ class UserInterface(QtWidgets.QMainWindow):
     def save_changes(self):
         for row in range(self.scroll_area_table.width()):
             if self.scroll_area_table.item(row, 0) is not None:
-                self.tracked[self.scroll_area_table.item(row, 0).text()].name = self.scroll_area_table.item(row, 1).text()
+                self.tracked[self.scroll_area_table.item(row, 0).text()].name = \
+                    self.scroll_area_table.item(row, 1).text()
         Tracker.write_times(self.tracked)
 
