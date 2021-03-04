@@ -15,7 +15,7 @@ class Tracker:
 
     def __init__(self):
         self.polling_time = 1
-        self.save_interval = 1
+        self.save_interval = 300
         self.tracked_applications = Tracker.get_tracked_applications()
         pid = os.getpid()
         Tracker.save_pid(pid)

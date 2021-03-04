@@ -1,6 +1,3 @@
-Todo:
--fix tracker saving on kill, then increase save interval
-
 Key features (done):
 -Tracker app
 	-Tracking statistics
@@ -15,6 +12,10 @@ Key features (done):
 	-Launching GUI stops tracker
 	-Closing starts tracker again
 
+Problems:
+-saving when tracking process is killed does not work due to Windows not supporting signals properly
+	-means that last 5 minutes of use are lost
+
 How to run:
 -run the included bat file
 
@@ -27,3 +28,4 @@ Dependencies:
 -psutil
 -pyqt5
 -jsons
+-win32process

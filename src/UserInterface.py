@@ -117,9 +117,9 @@ class UserInterface(QtWidgets.QMainWindow):
 
     @staticmethod
     def kill_tracker():
-        file = open("data/pid.txt")
-        pid = int(file.readline().rstrip())
         try:
+            file = open("data/pid.txt")
+            pid = int(file.readline().rstrip())
             os.kill(pid, signal.SIGTERM)
         except OSError:
             pass
