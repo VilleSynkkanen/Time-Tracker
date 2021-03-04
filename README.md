@@ -26,9 +26,4 @@
 
 ## Known issues
 
--Saving when GUI is launched or tracking process is otherwise killed does not work due to Windows not supporting cross-process signals properly. This means that the last 5 minutes of tracked data is lost.
-
-
-
-
-
+- Saving when GUI is launched or tracking process is otherwise killed does not work due to Windows not supporting cross-process signals properly. This means that the last 5 minutes of tracked data is lost.
