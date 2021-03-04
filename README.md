@@ -16,13 +16,13 @@
 
 ## Dependencies
 
--Python3
--PyQt5
--win32process
--win32gui
--WMI
--psutil
--jsons
+- Python3
+- PyQt5
+- win32process
+- win32gui
+- WMI
+- psutil
+- jsons
 
 ## Known issues
 
