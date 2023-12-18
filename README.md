@@ -6,24 +6,16 @@
 - Saves the data into a JSON file.
 - Only looks at the active window.
 - Includes a simple GUI that can be used to view tracked statistics.
-- Only works on Windows.
+- Works on Windows.
 
 ## Instructions
 
-- Running the tracker: run TimeTracker.bat.
-- Running the GUI: run TimeTrackerGUI.bat.
-- Running the tracker on startup: add a shortcut to the bat file to the startup folder of the start menu (C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup).
-
-## Dependencies
-
-- Python3
-- PyQt5
-- win32process
-- win32gui
-- WMI
-- psutil
-- jsons
+- Running the tracker: run TrackerApplication.exe.
+- Running the GUI: run TimeTrackerGUI.exe.
+- Running the tracker on startup (recommended): add a shortcut to the TrackerApplication.exe file to the startup folder of the start menu (C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup).
 
 ## Known issues
 
 - Saving when GUI is launched or tracking process is otherwise killed does not work due to Windows not supporting cross-process signals properly. This means that the last 5 minutes of tracked data is lost.
+- The tracker gets restarted after closing the GUI only if the UI window is closed first before closing the console window (may be fixed in the future).
+- Sorting by first or last used is not working correctly (may be fixed in the future).
