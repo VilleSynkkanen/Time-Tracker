@@ -76,18 +76,18 @@ class UserInterface(QtWidgets.QMainWindow):
             ended = QtWidgets.QTableWidgetItem(app.last.strftime("%m/%d/%Y, %H:%M:%S"))
             time_displayed = round(app.use_time / 3600, 2)
             use_time = QtWidgets.QTableWidgetItem()
-            use_time.setData(QtCore.Qt.DisplayRole, time_displayed)
+            use_time.setData(QtCore.Qt.ItemDataRole.DisplayRole, time_displayed)
             favourite = QtWidgets.QTableWidgetItem(str(app.favourite))
             hidden = QtWidgets.QTableWidgetItem(str(app.hidden))
             if self.hide_hidden and app.hidden:
                 self.scroll_area_table.hideRow(row)
 
-            exe_name.setFlags(started.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
-            started.setFlags(started.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
-            ended.setFlags(ended.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
-            use_time.setFlags(use_time.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
-            favourite.setFlags(favourite.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
-            hidden.setFlags(hidden.flags() ^ (QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
+            exe_name.setFlags(started.flags() ^ (QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEditable))
+            started.setFlags(started.flags() ^ (QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEditable))
+            ended.setFlags(ended.flags() ^ (QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEditable))
+            use_time.setFlags(use_time.flags() ^ (QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEditable))
+            favourite.setFlags(favourite.flags() ^ (QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEditable))
+            hidden.setFlags(hidden.flags() ^ (QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEditable))
             self.scroll_area_table.setItem(row, 0, exe_name)
             self.scroll_area_table.setItem(row, 1, name)
             self.scroll_area_table.setItem(row, 2, started)
@@ -113,7 +113,7 @@ class UserInterface(QtWidgets.QMainWindow):
 
     @staticmethod
     def start_tracker():
-        subprocess.call(["TimeTracker.bat"])
+        subprocess.call(["TrackerApplication.exe"])
 
     @staticmethod
     def kill_tracker():
@@ -189,9 +189,9 @@ class UserInterface(QtWidgets.QMainWindow):
 
     def sort(self):
         if self.ascending_sorting:
-            self.scroll_area_table.sortItems(self.sorting_mode, QtCore.Qt.AscendingOrder)
+            self.scroll_area_table.sortItems(self.sorting_mode, QtCore.Qt.SortOrder.AscendingOrder)
         else:
-            self.scroll_area_table.sortItems(self.sorting_mode, QtCore.Qt.DescendingOrder)
+            self.scroll_area_table.sortItems(self.sorting_mode, QtCore.Qt.SortOrder.DescendingOrder)
 
     def change_ascending_sorting(self):
         self.ascending_sorting = not self.ascending_sorting
