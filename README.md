@@ -12,7 +12,7 @@
 
 - Download the latest release.
 - Running the tracker: run TrackerApplication.exe.
-- Running the GUI: run TimeTrackerGUI.exe.
+- Running the GUI: run TrackerGUI.exe.
 - Running the tracker on startup (recommended): add a shortcut to the TrackerApplication.exe file to the startup folder of the start menu (C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup).
 
 ## Known issues
