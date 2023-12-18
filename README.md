@@ -2,7 +2,7 @@
 
 ## General
 
-- TimeTracker is a Python 3 application that runs in the background and tracks application use times.
+- TimeTracker is an application that runs in the background and tracks application use times.
 - Saves the data into a JSON file.
 - Only looks at the active window.
 - Includes a simple GUI that can be used to view tracked statistics.
@@ -10,6 +10,7 @@
 
 ## Instructions
 
+- Download the latest release.
 - Running the tracker: run TrackerApplication.exe.
 - Running the GUI: run TimeTrackerGUI.exe.
 - Running the tracker on startup (recommended): add a shortcut to the TrackerApplication.exe file to the startup folder of the start menu (C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup).
